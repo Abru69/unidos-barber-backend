@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CLIENTE
+  BARBERO
+}
+
+enum AppointmentStatus {
+  PENDIENTE
+  CONFIRMADA
+  CANCELADA
+  COMPLETADA
+  REPROGRAMADA
+}
+
+model User {
+  id           String   @id @default(uuid())
+  nombre       String
+  email        String   @unique
+  passwordHash String
+  telefono     String?
+  fotoUrl      String?
+  rol          Role     @default(CLIENTE)
+  createdAt    DateTime @default(now())
+
+  appointments  Appointment[]
+  galleryImages GalleryImage[]
+
+  @@map("users")
+}
+
+model Service {
+  id          String   @id @default(uuid())
+  nombre      String
+  descripcion String?
+  precio      Decimal  @db.Decimal(10, 2)
+  duracionMin Int
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  appointments Appointment[]
+
+  @@map("services")
+}
+
+model Appointment {
+  id            String            @id @default(uuid())
+  userId        String
+  serviceId     String
+  startDatetime DateTime
+  endDatetime   DateTime
+  estado        AppointmentStatus @default(PENDIENTE)
+  notas         String?
+  createdAt     DateTime          @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  service Service @relation(fields: [serviceId], references: [id])
+
+  @@map("appointments")
+}
+
+model GalleryImage {
+  id          String   @id @default(uuid())
+  url         String
+  descripcion String?
+  uploadedBy  String
+  visible     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  uploader User @relation(fields: [uploadedBy], references: [id])
+
+  @@map("gallery_images")
+}
+
+model BusinessHours {
+  id           String  @id @default(uuid())
+  diaSemana    Int
+  startTime    String
+  endTime      String
+  intervaloMin Int     @default(30)
+  activo       Boolean @default(true)
+
+  @@map("business_hours")
+}
