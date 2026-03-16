@@ -91,4 +91,35 @@ export class AppointmentsService {
   remove(id: string) {
     return this.prisma.appointment.delete({ where: { id } });
   }
+
+  // 👇 Esta es la nueva función que arregla el error en tu controlador
+  async getAvailabilityForDate(date: string) {
+    // Convierte el string de fecha (ej: '2026-03-20') en el inicio y fin de ese día
+    const startOfDay = new Date(`${date}T00:00:00.000Z`);
+    const endOfDay = new Date(`${date}T23:59:59.999Z`);
+
+    // Busca todas las citas de ese día que no estén canceladas
+    const bookedAppointments = await this.prisma.appointment.findMany({
+      where: {
+        startDatetime: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+        estado: {
+          in: ['PENDIENTE', 'CONFIRMADA'],
+        },
+      },
+      select: {
+        startDatetime: true,
+        endDatetime: true,
+      },
+      orderBy: {
+        startDatetime: 'asc',
+      },
+    });
+
+    // Retorna los horarios ocupados. Tu frontend puede usar esto para 
+    // bloquear esas horas y mostrar solo las disponibles.
+    return bookedAppointments;
+  }
 }
