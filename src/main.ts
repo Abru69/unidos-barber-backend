@@ -9,17 +9,19 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:4200',
+    origin: [
+      'http://localhost:4200',
+      /\.vercel\.app$/,
+      process.env.FRONTEND_URL,
+    ].filter(Boolean),
     credentials: true,
   });
 
   app.setGlobalPrefix('api/v1');
-
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new TransformInterceptor());
 
-  // Swagger
   const config = new DocumentBuilder()
     .setTitle('Unidos Barber Shop API')
     .setDescription('API REST para gestión de barbería')
