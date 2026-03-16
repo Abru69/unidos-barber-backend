@@ -36,3 +36,8 @@ export class AppointmentsController {
     return this.apptSvc.remove(id);
   }
 }
+
+  @Get('availability/:date')
+  getAvailability(@Param('date') date: string) {
+    return this.apptSvc.getAvailabilityForDate(date);
+  }
