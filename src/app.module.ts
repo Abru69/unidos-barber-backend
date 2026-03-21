@@ -9,6 +9,7 @@ import { ServicesModule } from './modules/services/services.module';
 import { AppointmentsModule } from './modules/appointments/appointments.module';
 import { GalleryModule } from './modules/gallery/gallery.module';
 import { BusinessModule } from './modules/business/business.module';
+import { EmailModule } from './modules/email/email.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { BusinessModule } from './modules/business/business.module';
       serveStaticOptions: { index: false },
     }),
     PrismaModule,
+    EmailModule,
     AuthModule,
     UsersModule,
     ServicesModule,
