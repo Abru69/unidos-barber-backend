@@ -20,13 +20,15 @@ export class AuthController {
 
   @Post('forgot-password')
   @HttpCode(200)
-  forgotPassword(@Body() body: { email: string }) {
+  forgotPassword(@Body() body: any) {
+    console.log('forgot-password body:', body);
     return this.authService.forgotPassword(body.email);
   }
 
   @Post('reset-password')
   @HttpCode(200)
-  resetPassword(@Body() body: { token: string; password: string }) {
+  resetPassword(@Body() body: any) {
+    console.log('reset-password body:', JSON.stringify(body));
     return this.authService.resetPassword(body.token, body.password);
   }
 }
