@@ -1,23 +1,22 @@
 import { Controller, Get, Put, Body, UseGuards } from '@nestjs/common';
+import { BusinessService } from './business.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
-import { PrismaService } from '../../prisma/prisma.service';
 
 @Controller('business')
 export class BusinessController {
-  constructor(private prisma: PrismaService) {}
+  constructor(private businessService: BusinessService) {}
 
   @Get('hours')
   getHours() {
-    return this.prisma.businessHours.findMany({ orderBy: { diaSemana: 'asc' } });
+    return this.businessService.getHours();
   }
 
   @Put('hours')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('BARBERO')
-  async updateHours(@Body() body: any[]) {
-    await this.prisma.businessHours.deleteMany();
-    return this.prisma.businessHours.createMany({ data: body });
+  updateHours(@Body() body: { dias: any[] }) {
+    return this.businessService.updateHours(body.dias);
   }
 }
